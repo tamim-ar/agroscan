@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wheat Leaf Disease Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <main class="site-shell">
+        <nav class="nav">
+            <a class="brand" href="/" aria-label="Wheat Leaf Disease Detection home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22V8"></path>
+                        <path d="M12 8c-4 0-7-2-8-6 4 0 7 2 8 6Z"></path>
+                        <path d="M12 8c4 0 7-2 8-6-4 0-7 2-8 6Z"></path>
+                        <path d="M12 16c-3.5 0-6-1.8-7-5 3.5 0 6 1.8 7 5Z"></path>
+                        <path d="M12 16c3.5 0 6-1.8 7-5-3.5 0-6 1.8-7 5Z"></path>
+                    </svg>
+                </span>
+                <span>
+                    <strong data-i18n="brand">AgroScan</strong>
+                    <small data-i18n="brandSub">Wheat health AI</small>
+                </span>
+            </a>
+
+            <div class="nav-actions" aria-label="Display controls">
+                <button class="icon-button" id="language-toggle" type="button" aria-label="Toggle language">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="m5 8 6 6"></path>
+                        <path d="m4 14 6-6 2-3"></path>
+                        <path d="M2 5h12"></path>
+                        <path d="M7 2h1"></path>
+                        <path d="m22 22-5-10-5 10"></path>
+                        <path d="M14 18h6"></path>
+                    </svg>
+                    <span data-i18n="languageToggle">Bangla</span>
+                </button>
+                <button class="icon-button" id="theme-toggle" type="button" aria-label="Toggle dark mode">
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                    <span data-i18n="themeToggle">Dark</span>
+                </button>
+            </div>
+        </nav>
+
+        <section class="hero-grid">
+            <section class="hero-copy" aria-labelledby="page-title">
+                <span class="eyebrow" data-i18n="eyebrow">AI crop disease assistant</span>
+                <h1 id="page-title" data-i18n="title">Wheat Leaf Disease Detection</h1>
+                <p data-i18n="lead">
+                    Upload a wheat leaf photo to identify disease class and confidence score in seconds.
+                </p>
+
+                <div class="insight-strip" aria-label="Model summary">
+                    <div>
+                        <strong>5</strong>
+                        <span data-i18n="classes">Classes</span>
+                    </div>
+                    <div>
+                        <strong>MobileNetV2</strong>
+                        <span data-i18n="model">Model</span>
+                    </div>
+                    <div>
+                        <strong>256 x 256</strong>
+                        <span data-i18n="inputSize">Input size</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="scanner-card" aria-labelledby="scanner-title">
+                <div class="scanner-header">
+                    <div>
+                        <span class="section-kicker" data-i18n="scannerKicker">Image scanner</span>
+                        <h2 id="scanner-title" data-i18n="scannerTitle">Analyze leaf sample</h2>
+                    </div>
+                    <span class="pulse" aria-hidden="true"></span>
+                </div>
+
+                <form class="upload-form" method="POST" enctype="multipart/form-data">
+                    <label class="dropzone" for="image">
+                        <span class="dropzone-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 16V4"></path>
+                                <path d="m7 9 5-5 5 5"></path>
+                                <path d="M20 16.5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5"></path>
+                            </svg>
+                        </span>
+                        <strong data-i18n="uploadTitle">Choose or drop leaf photo</strong>
+                        <span id="file-name" data-i18n="noFile">No file selected</span>
+                    </label>
+                    <input id="image" type="file" name="image" accept="image/*" required>
+
+                    <button class="primary-button" type="submit">
+                        <span data-i18n="predictButton">Predict disease</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M5 12h14"></path>
+                            <path d="m13 6 6 6-6 6"></path>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="sample-preview {% if image_path %}has-image{% endif %}" id="sample-preview">
+                    {% if image_path %}
+                        <img id="preview-image" src="{{ image_path }}" alt="Uploaded wheat leaf image" data-i18n-alt="imageAlt">
+                    {% else %}
+                        <img id="preview-image" src="" alt="" hidden>
+                        <div class="preview-empty">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <rect width="18" height="18" x="3" y="3" rx="3"></rect>
+                                <path d="m8 14 2.4-2.4a2 2 0 0 1 2.8 0L18 16.4"></path>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            </svg>
+                            <span data-i18n="previewEmpty">Selected image preview</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if prediction %}
+                    <div class="result-panel">
+                        <div>
+                            <span data-i18n="predictionLabel">Prediction</span>
+                            <strong data-disease-name="{{ prediction }}">{{ prediction }}</strong>
+                        </div>
+                        <div>
+                            <span data-i18n="confidenceLabel">Confidence</span>
+                            <strong>{{ confidence }}%</strong>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </section>
+
+        <section class="disease-section" aria-labelledby="disease-title">
+            <div class="section-heading">
+                <span class="section-kicker" data-i18n="diseaseKicker">Supported classes</span>
+                <h2 id="disease-title" data-i18n="diseaseTitle">All wheat disease categories</h2>
+            </div>
+
+            <div class="disease-grid">
+                <article class="disease-card">
+                    <span class="card-number">01</span>
+                    <h3 data-disease-name="BlackPoint">BlackPoint</h3>
+                    <p data-i18n="blackPointText">Dark discoloration on grain or leaf tissue that can reduce visible crop quality.</p>
+                </article>
+                <article class="disease-card">
+                    <span class="card-number">02</span>
+                    <h3 data-disease-name="FusariumFootRot">FusariumFootRot</h3>
+                    <p data-i18n="fusariumText">Stem base infection that can weaken plants and affect growth under field stress.</p>
+                </article>
+                <article class="disease-card">
+                    <span class="card-number">03</span>
+                    <h3 data-disease-name="HealthyLeaf">HealthyLeaf</h3>
+                    <p data-i18n="healthyText">Normal leaf sample without visible disease symptoms detected by the model.</p>
+                </article>
+                <article class="disease-card">
+                    <span class="card-number">04</span>
+                    <h3 data-disease-name="LeafBlight">LeafBlight</h3>
+                    <p data-i18n="blightText">Leaf lesions and browning that can spread across foliage and reduce plant vigor.</p>
+                </article>
+                <article class="disease-card">
+                    <span class="card-number">05</span>
+                    <h3 data-disease-name="WheatBlast">WheatBlast</h3>
+                    <p data-i18n="blastText">Aggressive fungal disease associated with severe spike and leaf damage.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const translations = {
+            en: {
+                htmlLang: 'en',
+                brand: 'AgroScan',
+                brandSub: 'Wheat health AI',
+                languageToggle: 'Bangla',
+                themeToggle: 'Dark',
+                lightThemeToggle: 'Light',
+                eyebrow: 'AI crop disease assistant',
+                title: 'Wheat Leaf Disease Detection',
+                lead: 'Upload a wheat leaf photo to identify disease class and confidence score in seconds.',
+                classes: 'Classes',
+                model: 'Model',
+                inputSize: 'Input size',
+                scannerKicker: 'Image scanner',
+                scannerTitle: 'Analyze leaf sample',
+                uploadTitle: 'Choose or drop leaf photo',
+                noFile: 'No file selected',
+                predictButton: 'Predict disease',
+                previewEmpty: 'Selected image preview',
+                predictionLabel: 'Prediction',
+                confidenceLabel: 'Confidence',
+                imageAlt: 'Uploaded wheat leaf image',
+                diseaseKicker: 'Supported classes',
+                diseaseTitle: 'All wheat disease categories',
+                blackPointText: 'Dark discoloration on grain or leaf tissue that can reduce visible crop quality.',
+                fusariumText: 'Stem base infection that can weaken plants and affect growth under field stress.',
+                healthyText: 'Normal leaf sample without visible disease symptoms detected by the model.',
+                blightText: 'Leaf lesions and browning that can spread across foliage and reduce plant vigor.',
+                blastText: 'Aggressive fungal disease associated with severe spike and leaf damage.',
+                diseases: {
+                    BlackPoint: 'BlackPoint',
+                    FusariumFootRot: 'FusariumFootRot',
+                    HealthyLeaf: 'HealthyLeaf',
+                    LeafBlight: 'LeafBlight',
+                    WheatBlast: 'WheatBlast'
+                }
+            },
+            bn: {
+                htmlLang: 'bn',
+                brand: '\u098f\u0997\u09cd\u09b0\u09cb\u09b8\u09cd\u0995\u09cd\u09af\u09be\u09a8',
+                brandSub: '\u0997\u09ae \u09b8\u09cd\u09ac\u09be\u09b8\u09cd\u09a5\u09cd\u09af \u098f\u0986\u0987',
+                languageToggle: 'English',
+                themeToggle: '\u09a1\u09be\u09b0\u09cd\u0995',
+                lightThemeToggle: '\u09b2\u09be\u0987\u099f',
+                eyebrow: '\u098f\u0986\u0987 \u09ab\u09b8\u09b2 \u09b0\u09cb\u0997 \u09b8\u09b9\u09be\u09df\u0995',
+                title: '\u0997\u09ae \u09aa\u09be\u09a4\u09be\u09b0 \u09b0\u09cb\u0997 \u09b6\u09a8\u09be\u0995\u09cd\u09a4\u0995\u09b0\u09a3',
+                lead: '\u0997\u09ae \u09aa\u09be\u09a4\u09be\u09b0 \u099b\u09ac\u09bf \u0986\u09aa\u09b2\u09cb\u09a1 \u0995\u09b0\u09c7 \u0995\u09df\u09c7\u0995 \u09b8\u09c7\u0995\u09c7\u09a8\u09cd\u09a1\u09c7 \u09b0\u09cb\u0997\u09c7\u09b0 \u09b6\u09cd\u09b0\u09c7\u09a3\u09bf \u098f\u09ac\u0982 \u0995\u09a8\u09ab\u09bf\u09a1\u09c7\u09a8\u09cd\u09b8 \u09b8\u09cd\u0995\u09cb\u09b0 \u09a6\u09c7\u0996\u09c1\u09a8\u0964',
+                classes: '\u09b6\u09cd\u09b0\u09c7\u09a3\u09bf',
+                model: '\u09ae\u09a1\u09c7\u09b2',
+                inputSize: '\u0987\u09a8\u09aa\u09c1\u099f \u09b8\u09be\u0987\u099c',
+                scannerKicker: '\u099b\u09ac\u09bf \u09b8\u09cd\u0995\u09cd\u09af\u09be\u09a8\u09be\u09b0',
+                scannerTitle: '\u09aa\u09be\u09a4\u09be\u09b0 \u09a8\u09ae\u09c1\u09a8\u09be \u09ac\u09bf\u09b6\u09cd\u09b2\u09c7\u09b7\u09a3',
+                uploadTitle: '\u09aa\u09be\u09a4\u09be\u09b0 \u099b\u09ac\u09bf \u09a8\u09bf\u09b0\u09cd\u09ac\u09be\u099a\u09a8 \u09ac\u09be \u09a1\u09cd\u09b0\u09aa \u0995\u09b0\u09c1\u09a8',
+                noFile: '\u0995\u09cb\u09a8\u09cb \u09ab\u09be\u0987\u09b2 \u09a8\u09bf\u09b0\u09cd\u09ac\u09be\u099a\u09a8 \u09b9\u09df\u09a8\u09bf',
+                predictButton: '\u09b0\u09cb\u0997 \u09b6\u09a8\u09be\u0995\u09cd\u09a4 \u0995\u09b0\u09c1\u09a8',
+                previewEmpty: '\u09a8\u09bf\u09b0\u09cd\u09ac\u09be\u099a\u09bf\u09a4 \u099b\u09ac\u09bf\u09b0 \u09aa\u09cd\u09b0\u09bf\u09ad\u09bf\u0989',
+                predictionLabel: '\u09aa\u09c2\u09b0\u09cd\u09ac\u09be\u09ad\u09be\u09b8',
+                confidenceLabel: '\u0995\u09a8\u09ab\u09bf\u09a1\u09c7\u09a8\u09cd\u09b8',
+                imageAlt: '\u0986\u09aa\u09b2\u09cb\u09a1 \u0995\u09b0\u09be \u0997\u09ae \u09aa\u09be\u09a4\u09be\u09b0 \u099b\u09ac\u09bf',
+                diseaseKicker: '\u09b8\u09be\u09aa\u09cb\u09b0\u09cd\u099f\u09c7\u09a1 \u0995\u09cd\u09b2\u09be\u09b8',
+                diseaseTitle: '\u09b8\u09ac \u0997\u09ae \u09b0\u09cb\u0997\u09c7\u09b0 \u0995\u09cd\u09af\u09be\u099f\u09be\u0997\u09b0\u09bf',
+                blackPointText: '\u09a6\u09be\u09a8\u09be \u09ac\u09be \u09aa\u09be\u09a4\u09be\u09df \u0995\u09be\u09b2\u099a\u09c7 \u09a6\u09be\u0997, \u09af\u09be \u09ab\u09b8\u09b2\u09c7\u09b0 \u09a6\u09c3\u09b6\u09cd\u09af\u09ae\u09be\u09a8 \u0997\u09c1\u09a3 \u0995\u09ae\u09be\u09a4\u09c7 \u09aa\u09be\u09b0\u09c7\u0964',
+                fusariumText: '\u0997\u09be\u099b\u09c7\u09b0 \u0997\u09cb\u09dc\u09be\u09df \u09b8\u0982\u0995\u09cd\u09b0\u09ae\u09a3, \u09af\u09be \u099a\u09be\u09aa\u09c7\u09b0 \u09ae\u09a7\u09cd\u09af\u09c7 \u09ac\u09c3\u09a6\u09cd\u09a7\u09bf \u09a6\u09c1\u09b0\u09cd\u09ac\u09b2 \u0995\u09b0\u09c7\u0964',
+                healthyText: '\u09ae\u09a1\u09c7\u09b2\u09c7\u09b0 \u09a6\u09c3\u09b7\u09cd\u099f\u09bf\u09a4\u09c7 \u09a6\u09c3\u09b6\u09cd\u09af\u09ae\u09be\u09a8 \u09b0\u09cb\u0997 \u099b\u09be\u09dc\u09be \u09b8\u09be\u09a7\u09be\u09b0\u09a3 \u09aa\u09be\u09a4\u09be\u09b0 \u09a8\u09ae\u09c1\u09a8\u09be\u0964',
+                blightText: '\u09aa\u09be\u09a4\u09be\u09df \u09a6\u09be\u0997 \u098f\u09ac\u0982 \u09ac\u09be\u09a6\u09be\u09ae\u09bf \u09b0\u0999, \u09af\u09be \u09ab\u09b8\u09b2\u09c7\u09b0 \u09b6\u0995\u09cd\u09a4\u09bf \u0995\u09ae\u09be\u09a4\u09c7 \u09aa\u09be\u09b0\u09c7\u0964',
+                blastText: '\u0997\u09c1\u09b0\u09c1\u09a4\u09b0 \u099b\u09a4\u09cd\u09b0\u09be\u0995\u099c\u09a8\u09bf\u09a4 \u09b0\u09cb\u0997, \u09af\u09be \u09b6\u09c0\u09b7 \u098f\u09ac\u0982 \u09aa\u09be\u09a4\u09be\u09df \u0995\u09cd\u09b7\u09a4\u09bf \u0995\u09b0\u09c7\u0964',
+                diseases: {
+                    BlackPoint: '\u09ac\u09cd\u09b2\u09cd\u09af\u09be\u0995 \u09aa\u09df\u09c7\u09a8\u09cd\u099f',
+                    FusariumFootRot: '\u09ab\u09c1\u09b8\u09be\u09b0\u09bf\u09df\u09be\u09ae \u09ab\u09c1\u099f \u09b0\u099f',
+                    HealthyLeaf: '\u09b8\u09c1\u09b8\u09cd\u09a5 \u09aa\u09be\u09a4\u09be',
+                    LeafBlight: '\u09b2\u09bf\u09ab \u09ac\u09cd\u09b2\u09be\u0987\u099f',
+                    WheatBlast: '\u09b9\u09c1\u0987\u099f \u09ac\u09cd\u09b2\u09be\u09b8\u09cd\u099f'
+                }
+            }
+        };
+
+        const fileInput = document.querySelector('#image');
+        const fileName = document.querySelector('#file-name');
+        const preview = document.querySelector('#sample-preview');
+        const previewImage = document.querySelector('#preview-image');
+        const previewEmpty = document.querySelector('.preview-empty');
+        const themeToggle = document.querySelector('#theme-toggle');
+        const languageToggle = document.querySelector('#language-toggle');
+
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        function applyTheme(theme) {
+            currentTheme = theme;
+            document.body.dataset.theme = theme;
+            localStorage.setItem('theme', theme);
+            applyLanguage(currentLanguage);
+        }
+
+        function applyLanguage(language) {
+            currentLanguage = language;
+            const text = translations[language];
+            document.documentElement.lang = text.htmlLang;
+
+            document.querySelectorAll('[data-i18n]').forEach((element) => {
+                const key = element.dataset.i18n;
+                element.textContent = key === 'themeToggle' && currentTheme === 'dark'
+                    ? text.lightThemeToggle
+                    : text[key];
+            });
+
+            document.querySelectorAll('[data-disease-name]').forEach((element) => {
+                const disease = element.dataset.diseaseName;
+                element.textContent = text.diseases[disease] || disease;
+            });
+
+            document.querySelectorAll('[data-i18n-alt]').forEach((element) => {
+                element.alt = text[element.dataset.i18nAlt];
+            });
+
+            if (!fileInput.files.length) {
+                fileName.textContent = text.noFile;
+            }
+
+            localStorage.setItem('language', language);
+        }
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            fileName.textContent = file ? file.name : translations[currentLanguage].noFile;
+
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                previewImage.src = event.target.result;
+                previewImage.hidden = false;
+                preview.classList.add('has-image');
+                if (previewEmpty) previewEmpty.hidden = true;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        themeToggle.addEventListener('click', () => {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        languageToggle.addEventListener('click', () => {
+            applyLanguage(currentLanguage === 'en' ? 'bn' : 'en');
+        });
+
+        applyTheme(currentTheme);
+        applyLanguage(currentLanguage);
+    </script>
+</body>
+</html>
